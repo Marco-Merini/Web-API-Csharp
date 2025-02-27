@@ -26,7 +26,7 @@ namespace Web_API
 
             dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Marca", DataPropertyName = "brand" });
             dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tipo", DataPropertyName = "product_type" });
-            dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Categoria", DataPropertyName = "product_category" });
+            dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Categoria", DataPropertyName = "category" });
             dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tags", DataPropertyName = "TagsDisplay" });
         }
 
@@ -44,9 +44,9 @@ namespace Web_API
                     {
                         _categoriesByType[product.product_type] = new List<string>();
                     }
-                    if (!string.IsNullOrEmpty(product.product_category) && !_categoriesByType[product.product_type].Contains(product.product_category))
+                    if (!string.IsNullOrEmpty(product.category) && !_categoriesByType[product.product_type].Contains(product.category))
                     {
-                        _categoriesByType[product.product_type].Add(product.product_category);
+                        _categoriesByType[product.product_type].Add(product.category);
                     }
 
                     if (!_tagsByType.ContainsKey(product.product_type))
