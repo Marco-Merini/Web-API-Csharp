@@ -37,7 +37,7 @@ namespace Web_API.Forms
             imageColumn.HeaderText = "Imagem";
             imageColumn.Name = "imgProduct";
             imageColumn.ImageLayout = DataGridViewImageCellLayout.Zoom;
-            imageColumn.Width = 80;
+            imageColumn.Width = 60;
             dgvProducts.Columns.Add(imageColumn);
 
             DataGridViewTextBoxColumn brandColumn = new DataGridViewTextBoxColumn();
@@ -52,7 +52,7 @@ namespace Web_API.Forms
 
             DataGridViewTextBoxColumn categoryColumn = new DataGridViewTextBoxColumn();
             categoryColumn.HeaderText = "Categoria";
-            categoryColumn.DataPropertyName = "product_category";
+            categoryColumn.DataPropertyName = "category";
             dgvProducts.Columns.Add(categoryColumn);
 
             DataGridViewTextBoxColumn tagsColumn = new DataGridViewTextBoxColumn();
@@ -118,28 +118,14 @@ namespace Web_API.Forms
                     {
                         _categoriesByType[product.product_type] = new List<string>();
                     }
-                    if (!string.IsNullOrEmpty(product.product_category) &&
-                        !_categoriesByType[product.product_type].Contains(product.product_category))
-                    {
-                        _categoriesByType[product.product_type].Add(product.product_category);
-                    }
 
-                    if (!_tagsByType.ContainsKey(product.product_type))
+                    if (!string.IsNullOrEmpty(product.category) && !_categoriesByType[product.product_type].Contains(product.category))
                     {
-                        _tagsByType[product.product_type] = new List<string>();
-                    }
-                    if (product.tag_list != null)
-                    {
-                        foreach (var tag in product.tag_list)
-                        {
-                            if (!_tagsByType[product.product_type].Contains(tag))
-                            {
-                                _tagsByType[product.product_type].Add(tag);
-                            }
-                        }
+                        _categoriesByType[product.product_type].Add(product.category);
                     }
                 }
             }
+
         }
 
         private void UpdateComboBox(ComboBox comboBox, List<string> items)
@@ -177,7 +163,13 @@ namespace Web_API.Forms
 
                 if (_categoriesByType.ContainsKey(selectedType))
                 {
+                    var categorias = _categoriesByType[selectedType].ToArray();
+                    MessageBox.Show($"Categorias encontradas: {string.Join(", ", categorias)}");
                     cmbCategory.Items.AddRange(_categoriesByType[selectedType].ToArray());
+                }
+                else
+                {
+                    MessageBox.Show("Nenhuma categoria encontrada para esse tipo.");
                 }
 
                 if (_tagsByType.ContainsKey(selectedType))
@@ -220,7 +212,7 @@ namespace Web_API.Forms
                 if (hasCategory)
                 {
                     string selectedCategory = cmbCategory.SelectedItem.ToString();
-                    filteredProducts = filteredProducts.Where(p => p.product_category == selectedCategory).ToList();
+                    filteredProducts = filteredProducts.Where(p => p.category == selectedCategory).ToList();
                 }
 
                 // Filtrar por tag se selecionada
@@ -262,11 +254,19 @@ namespace Web_API.Forms
                 if (rowIndex < bs.Count)
                 {
                     Product product = (Product)bs[rowIndex];
-                    return product?.image_link;
+                    string imageUrl = product?.api_featured_image;
+                    if (!string.IsNullOrEmpty(imageUrl) && imageUrl.StartsWith("//"))
+                    {
+                        // Converte para URL absoluta
+                        imageUrl = "https:" + imageUrl;
+                    }
+                    return imageUrl;
                 }
             }
             return null;
         }
+
+
 
         private async void DgvProducts_Scroll(object sender, ScrollEventArgs e)
         {

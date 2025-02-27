@@ -154,7 +154,7 @@
             this.dgvProducts.Name = "dgvProducts";
             this.dgvProducts.ReadOnly = true;
             this.dgvProducts.RowTemplate.Height = 80;
-            this.dgvProducts.Size = new System.Drawing.Size(957, 544);
+            this.dgvProducts.Size = new System.Drawing.Size(1227, 642);
             this.dgvProducts.TabIndex = 9;
             // 
             // lblStatus
@@ -176,9 +176,9 @@
             this.panel1.BackColor = System.Drawing.Color.Teal;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Controls.Add(this.lblStatus);
-            this.panel1.Location = new System.Drawing.Point(12, 641);
+            this.panel1.Location = new System.Drawing.Point(12, 739);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(957, 38);
+            this.panel1.Size = new System.Drawing.Size(1227, 38);
             this.panel1.TabIndex = 11;
             // 
             // btnLimpar
@@ -198,7 +198,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.PaleTurquoise;
-            this.ClientSize = new System.Drawing.Size(981, 682);
+            this.ClientSize = new System.Drawing.Size(1251, 780);
             this.Controls.Add(this.btnLimpar);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dgvProducts);
