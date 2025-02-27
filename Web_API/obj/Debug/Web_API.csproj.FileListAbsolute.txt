@@ -7,7 +7,7 @@ C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.csproj.Generat
 C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.csproj.CoreCompileInputs.cache
 C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.exe
 C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.pdb
-C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.Form1.resources
 C:\Users\Marco\Documents\Web-API-Csharp\Web_API\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Marco\Documents\Web-API-Csharp\Web_API\bin\Debug\Newtonsoft.Json.xml
 C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.csproj.CopyComplete
+C:\Users\Marco\Documents\Web-API-Csharp\Web_API\obj\Debug\Web_API.Forms.MainForm.resources

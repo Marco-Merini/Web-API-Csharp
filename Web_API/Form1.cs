@@ -1,36 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using System.IO;
-using System.Drawing;
-using System.ComponentModel;
+using Web_API.Helpers;
+using Web_API.Models;
+using Web_API.Services;
 
-namespace Web_API
+namespace Web_API.Forms
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        private const string BaseUrl = "https://makeup-api.herokuapp.com/api/v1/products";
-        private readonly HttpClient _httpClient = new HttpClient();
+        private readonly MakeupApiService _apiService = new MakeupApiService();
+        private readonly ImageHelper _imageHelper;
+
         private List<Product> _products = new List<Product>();
         private List<string> _brands = new List<string>();
         private List<string> _productTypes = new List<string>();
         private Dictionary<string, List<string>> _categoriesByType = new Dictionary<string, List<string>>();
         private Dictionary<string, List<string>> _tagsByType = new Dictionary<string, List<string>>();
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
+            _imageHelper = new ImageHelper(_apiService);
             InitializeControls();
         }
 
         private void InitializeControls()
         {
-
             dgvProducts.AutoGenerateColumns = false;
             dgvProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
@@ -62,6 +61,7 @@ namespace Web_API
             dgvProducts.Columns.Add(tagsColumn);
 
             cmbType.SelectedIndexChanged += CmbType_SelectedIndexChanged;
+            dgvProducts.Scroll += DgvProducts_Scroll;
 
             LoadInitialDataAsync();
         }
@@ -73,55 +73,26 @@ namespace Web_API
                 string statusMessage = "Carregando dados...";
                 lblStatus.Text = statusMessage;
 
-                string jsonResponse = await _httpClient.GetStringAsync(BaseUrl + ".json");
-                _products = JsonConvert.DeserializeObject<List<Product>>(jsonResponse);
+                _products = await _apiService.GetAllProductsAsync();
 
                 if (_products != null)
                 {
                     _categoriesByType.Clear();
                     _tagsByType.Clear();
-                    
+
                     _brands = _products.Where(p => !string.IsNullOrEmpty(p.brand))
-                                        .Select(p => p.brand)
-                                        .Distinct()
-                                        .OrderBy(b => b)
-                                        .ToList();
+                                       .Select(p => p.brand)
+                                       .Distinct()
+                                       .OrderBy(b => b)
+                                       .ToList();
 
                     _productTypes = _products.Where(p => !string.IsNullOrEmpty(p.product_type))
-                                             .Select(p => p.product_type)
-                                             .Distinct()
-                                             .OrderBy(t => t)
-                                             .ToList();
-                    
-                    foreach (var product in _products)
-                    {
-                        if (!string.IsNullOrEmpty(product.product_type))
-                        {
-                            if (!_categoriesByType.ContainsKey(product.product_type))
-                            {
-                                _categoriesByType[product.product_type] = new List<string>();
-                            }
-                            if (!string.IsNullOrEmpty(product.product_category) && !_categoriesByType[product.product_type].Contains(product.product_category))
-                            {
-                                _categoriesByType[product.product_type].Add(product.product_category);
-                            }
+                                            .Select(p => p.product_type)
+                                            .Distinct()
+                                            .OrderBy(t => t)
+                                            .ToList();
 
-                            if (!_tagsByType.ContainsKey(product.product_type))
-                            {
-                                _tagsByType[product.product_type] = new List<string>();
-                            }
-                            if (product.tag_list != null)
-                            {
-                                foreach (var tag in product.tag_list)
-                                {
-                                    if (!_tagsByType[product.product_type].Contains(tag))
-                                    {
-                                        _tagsByType[product.product_type].Add(tag);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    ProcessProductCategories();
 
                     UpdateComboBox(cmbBrand, _brands);
                     UpdateComboBox(cmbType, _productTypes);
@@ -134,6 +105,40 @@ namespace Web_API
             {
                 lblStatus.Text = "Erro ao carregar dados.";
                 MessageBox.Show($"Erro ao carregar dados: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ProcessProductCategories()
+        {
+            foreach (var product in _products)
+            {
+                if (!string.IsNullOrEmpty(product.product_type))
+                {
+                    if (!_categoriesByType.ContainsKey(product.product_type))
+                    {
+                        _categoriesByType[product.product_type] = new List<string>();
+                    }
+                    if (!string.IsNullOrEmpty(product.product_category) &&
+                        !_categoriesByType[product.product_type].Contains(product.product_category))
+                    {
+                        _categoriesByType[product.product_type].Add(product.product_category);
+                    }
+
+                    if (!_tagsByType.ContainsKey(product.product_type))
+                    {
+                        _tagsByType[product.product_type] = new List<string>();
+                    }
+                    if (product.tag_list != null)
+                    {
+                        foreach (var tag in product.tag_list)
+                        {
+                            if (!_tagsByType[product.product_type].Contains(tag))
+                            {
+                                _tagsByType[product.product_type].Add(tag);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -197,47 +202,32 @@ namespace Web_API
                 string statusMessage = "Buscando produtos...";
                 lblStatus.Text = statusMessage;
 
-                StringBuilder queryParams = new StringBuilder();
-
-                if (cmbBrand.SelectedIndex > 0)
-                {
-                    string brand = cmbBrand.SelectedItem.ToString();
-                    queryParams.Append($"?brand={Uri.EscapeDataString(brand)}");
-                }
-
-                if (cmbType.SelectedIndex > 0)
-                {
-                    string productType = cmbType.SelectedItem.ToString();
-                    if (queryParams.Length == 0)
-                        queryParams.Append($"?product_type={Uri.EscapeDataString(productType)}");
-                    else
-                        queryParams.Append($"&product_type={Uri.EscapeDataString(productType)}");
-                }
-
-                bool hasCategory = cmbCategory.SelectedIndex > 0;
-                bool hasTag = cmbTag.SelectedIndex > 0;
-                string selectedCategory = hasCategory ? cmbCategory.SelectedItem.ToString() : null;
-                string selectedTag = hasTag ? cmbTag.SelectedItem.ToString() : null;
+                string selectedBrand = cmbBrand.SelectedIndex > 0 ? cmbBrand.SelectedItem.ToString() : null;
+                string selectedType = cmbType.SelectedIndex > 0 ? cmbType.SelectedItem.ToString() : null;
 
                 List<Product> filteredProducts;
-                if (queryParams.Length > 0)
+                if (!string.IsNullOrEmpty(selectedBrand) || !string.IsNullOrEmpty(selectedType))
                 {
-                    string url = BaseUrl + ".json" + queryParams.ToString();
-                    string jsonResponse = await _httpClient.GetStringAsync(url);
-                    filteredProducts = JsonConvert.DeserializeObject<List<Product>>(jsonResponse);
+                    filteredProducts = await _apiService.GetFilteredProductsAsync(selectedBrand, selectedType);
                 }
                 else
                 {
                     filteredProducts = new List<Product>(_products);
                 }
 
+                // Filtrar por categoria se selecionada
+                bool hasCategory = cmbCategory.SelectedIndex > 0;
                 if (hasCategory)
                 {
+                    string selectedCategory = cmbCategory.SelectedItem.ToString();
                     filteredProducts = filteredProducts.Where(p => p.product_category == selectedCategory).ToList();
                 }
 
+                // Filtrar por tag se selecionada
+                bool hasTag = cmbTag.SelectedIndex > 0;
                 if (hasTag)
                 {
+                    string selectedTag = cmbTag.SelectedItem.ToString();
                     filteredProducts = filteredProducts.Where(p =>
                         p.tag_list != null && p.tag_list.Contains(selectedTag)).ToList();
                 }
@@ -248,7 +238,7 @@ namespace Web_API
                 dgvProducts.DataSource = dataSource;
 
                 // Atualizar as imagens visíveis
-                LoadImagesForVisibleRows();
+                await LoadImagesForVisibleRows();
 
                 // Exibir o número de produtos encontrados
                 lblStatus.Text = $"Produtos encontrados: {filteredProducts.Count}";
@@ -260,80 +250,39 @@ namespace Web_API
             }
         }
 
-        private void LoadImagesForVisibleRows()
+        private async Task LoadImagesForVisibleRows()
         {
-            foreach (DataGridViewRow row in dgvProducts.Rows)
-            {
-                if (row.Visible && row.Index < dgvProducts.RowCount)
-                {
-                    Product product = dgvProducts.DataSource is BindingSource bs
-                        ? (Product)bs[row.Index]
-                        : null;
-
-                    if (product != null && !string.IsNullOrEmpty(product.image_link))
-                    {
-                        LoadImageForCell(row.Index, 0, product.image_link);
-                    }
-                }
-            }
+            await _imageHelper.LoadImagesForVisibleRows(dgvProducts, GetImageUrlForRow);
         }
 
-        private async void LoadImageForCell(int rowIndex, int columnIndex, string imageUrl)
+        private string GetImageUrlForRow(int rowIndex)
         {
-            try
+            if (dgvProducts.DataSource is BindingSource bs)
             {
-                if (string.IsNullOrEmpty(imageUrl))
-                    return;
-
-                using (HttpResponseMessage response = await _httpClient.GetAsync(imageUrl))
+                if (rowIndex < bs.Count)
                 {
-                    if (response.IsSuccessStatusCode)
-                    {
-                        using (Stream imageStream = await response.Content.ReadAsStreamAsync())
-                        {
-                            if (dgvProducts.Rows.Count > rowIndex)
-                            {
-
-                                Image img = Image.FromStream(imageStream);
-
-
-                                dgvProducts.Rows[rowIndex].Cells[columnIndex].Value = img;
-                            }
-                        }
-                    }
+                    Product product = (Product)bs[rowIndex];
+                    return product?.image_link;
                 }
             }
-            catch
-            {
-            }
+            return null;
         }
 
-        private void dgvProducts_Scroll(object sender, ScrollEventArgs e)
+        private async void DgvProducts_Scroll(object sender, ScrollEventArgs e)
         {
             if (e.ScrollOrientation == ScrollOrientation.VerticalScroll)
             {
-                LoadImagesForVisibleRows();
+                await LoadImagesForVisibleRows();
             }
         }
 
         private void btnLimpar_Click(object sender, EventArgs e)
         {
-            dgvProducts.Rows.Clear();
-            cmbBrand.SelectedIndex = -1;
-            cmbType.SelectedIndex = -1;
-            cmbCategory.SelectedIndex = -1;
-            cmbTag.SelectedIndex = -1;
+            dgvProducts.DataSource = null;
+            cmbBrand.SelectedIndex = 0;
+            cmbType.SelectedIndex = 0;
+            cmbCategory.SelectedIndex = 0;
+            cmbTag.SelectedIndex = 0;
         }
     }
-
-    public class Product
-    {
-        public string brand { get; set; }
-        public string product_type { get; set; }
-        public string product_category { get; set; }
-        public List<string> tag_list { get; set; }
-        public string image_link { get; set; }
-        public string TagsDisplay => tag_list != null ? string.Join(", ", tag_list) : string.Empty;
-    }
-
 }

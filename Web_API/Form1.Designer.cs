@@ -1,6 +1,6 @@
-﻿namespace Web_API
+﻿namespace Web_API.Forms
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -193,7 +193,7 @@
             this.btnLimpar.UseVisualStyleBackColor = false;
             this.btnLimpar.Click += new System.EventHandler(this.btnLimpar_Click);
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -212,7 +212,7 @@
             this.Controls.Add(this.cmbBrand);
             this.Controls.Add(this.label1);
             this.MinimumSize = new System.Drawing.Size(600, 400);
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Buscador de Maquiagem";
             ((System.ComponentModel.ISupportInitialize)(this.dgvProducts)).EndInit();
@@ -224,7 +224,6 @@
         }
 
         #endregion
-
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox cmbBrand;
