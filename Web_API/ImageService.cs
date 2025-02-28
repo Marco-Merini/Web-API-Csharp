@@ -36,7 +36,7 @@ namespace Web_API.Helpers
             }
             catch
             {
-                // Silently fail on image loading errors
+
             }
         }
 

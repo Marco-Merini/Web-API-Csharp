@@ -114,6 +114,7 @@ namespace Web_API.Forms
             {
                 if (!string.IsNullOrEmpty(product.product_type))
                 {
+                    // Processamento de categorias (código existente)
                     if (!_categoriesByType.ContainsKey(product.product_type))
                     {
                         _categoriesByType[product.product_type] = new List<string>();
@@ -123,9 +124,35 @@ namespace Web_API.Forms
                     {
                         _categoriesByType[product.product_type].Add(product.category);
                     }
+
+                    if (!_tagsByType.ContainsKey(product.product_type))
+                    {
+                        _tagsByType[product.product_type] = new List<string>();
+                    }
+
+                    if (product.tag_list != null && product.tag_list.Count > 0)
+                    {
+                        foreach (var tag in product.tag_list)
+                        {
+                            if (!string.IsNullOrEmpty(tag) && !_tagsByType[product.product_type].Contains(tag))
+                            {
+                                _tagsByType[product.product_type].Add(tag);
+                            }
+                        }
+                    }
                 }
             }
 
+            // Ordenar as listas de categorias e tags
+            foreach (var key in _categoriesByType.Keys.ToList())
+            {
+                _categoriesByType[key] = _categoriesByType[key].OrderBy(c => c).ToList();
+            }
+
+            foreach (var key in _tagsByType.Keys.ToList())
+            {
+                _tagsByType[key] = _tagsByType[key].OrderBy(t => t).ToList();
+            }
         }
 
         private void UpdateComboBox(ComboBox comboBox, List<string> items)
@@ -163,13 +190,7 @@ namespace Web_API.Forms
 
                 if (_categoriesByType.ContainsKey(selectedType))
                 {
-                    var categorias = _categoriesByType[selectedType].ToArray();
-                    MessageBox.Show($"Categorias encontradas: {string.Join(", ", categorias)}");
                     cmbCategory.Items.AddRange(_categoriesByType[selectedType].ToArray());
-                }
-                else
-                {
-                    MessageBox.Show("Nenhuma categoria encontrada para esse tipo.");
                 }
 
                 if (_tagsByType.ContainsKey(selectedType))
@@ -179,6 +200,41 @@ namespace Web_API.Forms
             }
 
             cmbCategory.SelectedIndex = 0;
+            cmbTag.SelectedIndex = 0;
+        }
+
+        // Adicione este novo método para atualizar as tags quando a categoria mudar
+        private void CmbCategory_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbType.SelectedIndex <= 0) return;
+
+            string selectedType = cmbType.SelectedItem.ToString();
+            string selectedCategory = cmbCategory.SelectedIndex > 0 ? cmbCategory.SelectedItem.ToString() : null;
+
+            cmbTag.Items.Clear();
+            cmbTag.Items.Add("Todas as tags");
+
+            if (_tagsByType.ContainsKey(selectedType))
+            {
+                if (selectedCategory != null)
+                {
+                    // Filtrar tags que correspondem a produtos do tipo e categoria selecionados
+                    var tagsForCategory = _products
+                        .Where(p => p.product_type == selectedType && p.category == selectedCategory && p.tag_list != null)
+                        .SelectMany(p => p.tag_list)
+                        .Distinct()
+                        .OrderBy(t => t)
+                        .ToList();
+
+                    cmbTag.Items.AddRange(tagsForCategory.ToArray());
+                }
+                else
+                {
+                    // Se nenhuma categoria específica for selecionada, mostrar todas as tags do tipo
+                    cmbTag.Items.AddRange(_tagsByType[selectedType].ToArray());
+                }
+            }
+
             cmbTag.SelectedIndex = 0;
         }
 
@@ -196,8 +252,12 @@ namespace Web_API.Forms
 
                 string selectedBrand = cmbBrand.SelectedIndex > 0 ? cmbBrand.SelectedItem.ToString() : null;
                 string selectedType = cmbType.SelectedIndex > 0 ? cmbType.SelectedItem.ToString() : null;
+                string selectedCategory = cmbCategory.SelectedIndex > 0 ? cmbCategory.SelectedItem.ToString() : null;
+                string selectedTag = cmbTag.SelectedIndex > 0 ? cmbTag.SelectedItem.ToString() : null;
 
                 List<Product> filteredProducts;
+
+                // Primeiro filtro: API (marca e tipo)
                 if (!string.IsNullOrEmpty(selectedBrand) || !string.IsNullOrEmpty(selectedType))
                 {
                     filteredProducts = await _apiService.GetFilteredProductsAsync(selectedBrand, selectedType);
@@ -207,19 +267,15 @@ namespace Web_API.Forms
                     filteredProducts = new List<Product>(_products);
                 }
 
-                // Filtrar por categoria se selecionada
-                bool hasCategory = cmbCategory.SelectedIndex > 0;
-                if (hasCategory)
+                // Segundo filtro: categoria local
+                if (!string.IsNullOrEmpty(selectedCategory))
                 {
-                    string selectedCategory = cmbCategory.SelectedItem.ToString();
                     filteredProducts = filteredProducts.Where(p => p.category == selectedCategory).ToList();
                 }
 
-                // Filtrar por tag se selecionada
-                bool hasTag = cmbTag.SelectedIndex > 0;
-                if (hasTag)
+                // Terceiro filtro: tag local
+                if (!string.IsNullOrEmpty(selectedTag))
                 {
-                    string selectedTag = cmbTag.SelectedItem.ToString();
                     filteredProducts = filteredProducts.Where(p =>
                         p.tag_list != null && p.tag_list.Contains(selectedTag)).ToList();
                 }
@@ -257,7 +313,6 @@ namespace Web_API.Forms
                     string imageUrl = product?.api_featured_image;
                     if (!string.IsNullOrEmpty(imageUrl) && imageUrl.StartsWith("//"))
                     {
-                        // Converte para URL absoluta
                         imageUrl = "https:" + imageUrl;
                     }
                     return imageUrl;
@@ -265,8 +320,6 @@ namespace Web_API.Forms
             }
             return null;
         }
-
-
 
         private async void DgvProducts_Scroll(object sender, ScrollEventArgs e)
         {

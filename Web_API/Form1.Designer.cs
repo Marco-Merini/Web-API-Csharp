@@ -63,14 +63,14 @@
             this.cmbBrand.FormattingEnabled = true;
             this.cmbBrand.Location = new System.Drawing.Point(99, 8);
             this.cmbBrand.Name = "cmbBrand";
-            this.cmbBrand.Size = new System.Drawing.Size(172, 29);
+            this.cmbBrand.Size = new System.Drawing.Size(202, 29);
             this.cmbBrand.TabIndex = 1;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            this.label2.Location = new System.Drawing.Point(298, 15);
+            this.label2.Location = new System.Drawing.Point(321, 15);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(43, 21);
             this.label2.TabIndex = 2;
@@ -82,9 +82,9 @@
             this.cmbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbType.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             this.cmbType.FormattingEnabled = true;
-            this.cmbType.Location = new System.Drawing.Point(347, 7);
+            this.cmbType.Location = new System.Drawing.Point(370, 7);
             this.cmbType.Name = "cmbType";
-            this.cmbType.Size = new System.Drawing.Size(165, 29);
+            this.cmbType.Size = new System.Drawing.Size(192, 29);
             this.cmbType.TabIndex = 3;
             // 
             // label3
@@ -105,14 +105,14 @@
             this.cmbCategory.FormattingEnabled = true;
             this.cmbCategory.Location = new System.Drawing.Point(99, 43);
             this.cmbCategory.Name = "cmbCategory";
-            this.cmbCategory.Size = new System.Drawing.Size(172, 29);
+            this.cmbCategory.Size = new System.Drawing.Size(202, 29);
             this.cmbCategory.TabIndex = 5;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            this.label4.Location = new System.Drawing.Point(298, 50);
+            this.label4.Location = new System.Drawing.Point(321, 50);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(35, 21);
             this.label4.TabIndex = 6;
@@ -124,16 +124,16 @@
             this.cmbTag.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTag.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
             this.cmbTag.FormattingEnabled = true;
-            this.cmbTag.Location = new System.Drawing.Point(347, 43);
+            this.cmbTag.Location = new System.Drawing.Point(370, 43);
             this.cmbTag.Name = "cmbTag";
-            this.cmbTag.Size = new System.Drawing.Size(165, 29);
+            this.cmbTag.Size = new System.Drawing.Size(192, 29);
             this.cmbTag.TabIndex = 7;
             // 
             // btnSearch
             // 
             this.btnSearch.BackColor = System.Drawing.Color.MediumTurquoise;
             this.btnSearch.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            this.btnSearch.Location = new System.Drawing.Point(543, 27);
+            this.btnSearch.Location = new System.Drawing.Point(609, 27);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(98, 44);
             this.btnSearch.TabIndex = 8;
@@ -154,7 +154,7 @@
             this.dgvProducts.Name = "dgvProducts";
             this.dgvProducts.ReadOnly = true;
             this.dgvProducts.RowTemplate.Height = 80;
-            this.dgvProducts.Size = new System.Drawing.Size(1227, 642);
+            this.dgvProducts.Size = new System.Drawing.Size(1067, 664);
             this.dgvProducts.TabIndex = 9;
             // 
             // lblStatus
@@ -176,16 +176,16 @@
             this.panel1.BackColor = System.Drawing.Color.Teal;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel1.Controls.Add(this.lblStatus);
-            this.panel1.Location = new System.Drawing.Point(12, 739);
+            this.panel1.Location = new System.Drawing.Point(12, 761);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1227, 38);
+            this.panel1.Size = new System.Drawing.Size(1067, 38);
             this.panel1.TabIndex = 11;
             // 
             // btnLimpar
             // 
             this.btnLimpar.BackColor = System.Drawing.Color.MediumTurquoise;
             this.btnLimpar.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold);
-            this.btnLimpar.Location = new System.Drawing.Point(664, 27);
+            this.btnLimpar.Location = new System.Drawing.Point(730, 27);
             this.btnLimpar.Name = "btnLimpar";
             this.btnLimpar.Size = new System.Drawing.Size(98, 44);
             this.btnLimpar.TabIndex = 12;
@@ -198,7 +198,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.PaleTurquoise;
-            this.ClientSize = new System.Drawing.Size(1251, 780);
+            this.ClientSize = new System.Drawing.Size(1091, 802);
             this.Controls.Add(this.btnLimpar);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.dgvProducts);
